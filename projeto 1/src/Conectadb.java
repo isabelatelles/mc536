@@ -5,7 +5,7 @@ public class Conectadb {
     public static Connection getConnection() {  
         String EnderecoDB = "jdbc:mysql://localhost:3306/INFO_CRIMINAIS_SP";
         String usuario = "root";  
-        String senha = "pegtelles";
+        String senha = "SENHA";
         java.sql.Connection Conexao = null;
         
           try {   

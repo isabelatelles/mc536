@@ -7,7 +7,7 @@ public class Consultas {
 		Qtde_ocorrencia_delegacia("A NOITE");
 		BOs_circunscricao("38º D.P. VILA AMALIA");
 		Qtde_Homicidio_Cidade("simples");
-		Qtde_Roubo_Delegacia("TRANSEUNTE");
+		Qtde_Roubo_Delegacia("VEICULO");
 		Atos_Cidade("S.PAULO", "Ato infracional");
 	}
 
@@ -21,7 +21,7 @@ public class Consultas {
 			java.sql.PreparedStatement pstmt = null;
 			
 			String SQL = "SELECT B.NUM_BO, B.ANO_BO, B.SOLUCAO, D.NOME AS NOME_DELEGACIA, D.CIRCUNSCRICAO FROM BO B INNER JOIN DELEGACIA D " +
-					"ON B.DELEGACIA = D.ID_DELEGACIA WHERE D.CIRCUNSCRICAO = ? ORDER BY B.NUM_BO";
+					"ON B.DELEGACIA = D.ID_DELEGACIA WHERE D.CIRCUNSCRICAO = ?  ORDER BY B.NUM_BO";
 			
 			// Create PrepareStatement object
 		     pstmt = Conexao.prepareStatement(SQL);
@@ -81,7 +81,7 @@ public class Consultas {
 		    pstmt.setString(1, periodo);
 		    
 		    ResultSet result = pstmt.executeQuery();
-		    
+
 		    while(result.next()){
                 String NOME_DELEGACIA = result.getString("NOME_DELEGACIA");
                 int QTDE_OCORRENCIA = result.getInt("QTDE_OCORRENCIA");
@@ -109,7 +109,7 @@ public class Consultas {
 			
 			String SQL = "SELECT COUNT(OH.TIPO_HOMICIDIO) AS QNTD_HOM, E.CIDADE FROM ((SELECT H.TIPO_HOMICIDIO, O.ID_OCORRENCIA, O.ENDERECO_OCORRENCIA " +
 					"FROM HOMICIDIO H INNER JOIN OCORRENCIA O ON O.ID_OCORRENCIA = H.ID_OCORRENCIA) OH INNER JOIN ENDERECO E ON " +
-					"OH.ENDERECO_OCORRENCIA = E.ID_ENDERECO ) WHERE OH.TIPO_HOMICIDIO = ? GROUP BY E.CIDADE ORDER BY QNTD_HOM DESC";
+					"OH.ENDERECO_OCORRENCIA = E.ID_ENDERECO ) WHERE OH.TIPO_HOMICIDIO = ? AND E.CIDADE != '' GROUP BY E.CIDADE ORDER BY QNTD_HOM DESC";
 			
 			// Create PrepareStatement object
 		     pstmt = Conexao.prepareStatement(SQL);
@@ -138,7 +138,8 @@ public class Consultas {
             System.out.println("Problemas ao tentar conectar com o banco de dados: " + Excecao);
 		}
 	}
-	
+
+	// Quantidade de roubo de um certo tipo de objeto por delegacia
 	public static void Qtde_Roubo_Delegacia(String objeto) {
 		try {
 			Connection Conexao = Conectadb.getConnection();
@@ -162,7 +163,7 @@ public class Consultas {
 		    pstmt.setString(1, objeto);
 		    
 		    ResultSet result = pstmt.executeQuery();
-		    
+
 		    while(result.next()){
                 int FOI_ROUBADO = result.getInt("FOI_ROUBADO");
                 String NOME = result.getString("NOME");
@@ -170,7 +171,7 @@ public class Consultas {
                 
                 System.out.println("Delegacia: " + NOME);
                 System.out.println("Circunscricao: " + CIRCUNSCRICAO);
-                System.out.println("Quantidade de roubos " + objeto.toLowerCase() + ": " + FOI_ROUBADO);
+                System.out.println("Quantidade de roubos de " + objeto.toLowerCase() + ": " + FOI_ROUBADO);
                 System.out.println("-------------------------------------------");                    
             }
 		    
@@ -182,7 +183,7 @@ public class Consultas {
 		}
 	}
 	
-	
+	// BOs de um certo tipo de cidadee e um certo tipo de especie, ordenados pela data em que foram iniciados
 	public static void Atos_Cidade(String Cidade, String Especie) {
 		try {
 			Connection Conexao = Conectadb.getConnection();
@@ -190,8 +191,8 @@ public class Consultas {
 			// Prepared Statement
 			java.sql.PreparedStatement pstmt = null;
 			
-			String SQL = "SELECT OB.ID_BO, OB.ANO_BO, OB.ESPECIE, E.CIDADE, OB.DATA_INICIADO AS BO_INICIADO " +
-			 "FROM (SELECT B.DATA_INICIADO, O.ESPECIE, O.ENDERECO_OCORRENCIA, B.ID_BO, B.ANO_BO FROM OCORRENCIA O " +
+			String SQL = "SELECT OB.NUM_BO, OB.ANO_BO, OB.ESPECIE, E.CIDADE, OB.DATA_INICIADO AS BO_INICIADO " +
+			 "FROM (SELECT B.DATA_INICIADO, O.ESPECIE, O.ENDERECO_OCORRENCIA, B.NUM_BO, B.ANO_BO FROM OCORRENCIA O " +
 			 "INNER JOIN BO B ON O.BOLETIM_OCORRENCIA = B.ID_BO) OB INNER JOIN ENDERECO E ON (OB.ENDERECO_OCORRENCIA = E.ID_ENDERECO) " +
 			 "WHERE E.CIDADE = ? AND OB.ESPECIE = ? ORDER BY OB.DATA_INICIADO";
 			
@@ -208,17 +209,17 @@ public class Consultas {
 		    ResultSet result = pstmt.executeQuery();
 		    
 		    while(result.next()){
-                int ID_BO = result.getInt("ID_BO");
+                int NUM_BO = result.getInt("NUM_BO");
                 int ANO_BO = result.getInt("ANO_BO");
                 String ESPECIE = result.getString("ESPECIE");
                 String CIDADE = result.getString("CIDADE");
                 String BO_INICIADO = result.getString("BO_INICIADO");
                 
-                System.out.println("ID_BO: " + ID_BO);
-                System.out.println("ANO_BO: " + ID_BO);
-                System.out.println("ESPECIE: " + ESPECIE);
-                System.out.println("CIDADE: " + CIDADE);
-                System.out.println("BO_INICIADO: " + BO_INICIADO);
+                System.out.println("Numero do BO: " + NUM_BO);
+                System.out.println("Ano do BO" + ANO_BO);
+                System.out.println("Especie do BO: " + ESPECIE);
+                System.out.println("Cidade do BO: " + CIDADE);
+                System.out.println("Data de inicio do BO: " + BO_INICIADO);
                 System.out.println("-------------------------------------------");                    
             }
 		    
